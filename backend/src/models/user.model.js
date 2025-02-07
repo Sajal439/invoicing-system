@@ -12,11 +12,25 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, "Email is required"],
+      unique: true,
+      index: true,
     },
     password: {
       type: String,
       required: [true, "Password is required"],
-      //   minLength: [6, "Password must be at least 6 characters long"],
+      minLength: [6, "Password must be at least 6 characters long"],
+      select: false,
+    },
+    passwordConfirm: {
+      type: String,
+      required: [true, "please confirm your password"],
+      validate: {
+        // this only works on SAVE and CREATE!!!
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: "Passwords are not the same!",
+      },
     },
     refreshToken: {
       type: String,
@@ -26,12 +40,20 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function (next) {
+  // only run this function when password is modified
   if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
+  // hash the password with cost of 12
+  this.password = await bcrypt.hash(this.password, 12);
+  // delete confirm password field
+  this.passwordConfirm = undefined;
   next();
 });
-userSchema.methods.isPasswordCorrect = async function (password) {
-  return await bcrypt.compare(password, this.password);
+
+userSchema.methods.correctPassword = async function (
+  condidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(condidatePassword, userPassword);
 };
 
 export const User = mongoose.model("User", userSchema);
