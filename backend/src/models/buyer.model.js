@@ -17,6 +17,10 @@ const buyerSchema = new mongoose.Schema(
       type: String,
       required: [true, "Address of the buyer is required"],
     },
+    totalPurchase: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

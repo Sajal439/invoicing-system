@@ -65,7 +65,10 @@ const newInvoice = asyncHandler(async (req, res) => {
       await product.save();
     }
   }
-  
+
+  buyer.totalPurchase = (buyer.totalPurchase || 0) + finalPrice;
+  await buyer.save();
+
   console.log("Invoice", invoice);
   return res
     .status(201)
