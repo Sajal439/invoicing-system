@@ -3,6 +3,8 @@ import {
   addProduct,
   addProductQuantity,
   deleteProductQuantity,
+  updateCost,
+  updatePrice,
 } from "../controllers/product.controller.js";
 
 const productRouter = Router();
@@ -13,4 +15,6 @@ productRouter
   .route("/update-product/deduct-quantity")
   .put(deleteProductQuantity);
 
+productRouter.route("/update-price").put(updatePrice);
+productRouter.route("/product-cost", updateCost);
 export { productRouter };
