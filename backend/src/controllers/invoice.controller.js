@@ -1,20 +1,31 @@
-import { Buyer } from "../models/buyer.model.js";
 import { Invoice } from "../models/invoice.model.js";
+import { Party } from "../models/party.model.js";
 import { Product } from "../models/product.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 
 const newInvoice = asyncHandler(async (req, res) => {
-  const { products, discount, buyerName } = req.body;
+  const { products, discount, partyName, invoiceType } = req.body;
 
-  // fetch buyer details from database
-
-  const buyer = await Buyer.findOne({ buyerName });
-  console.log("Buyer", buyer);
-
-  if (!buyer) {
-    return res.status(404).json(new ApiError(404, "Buyer not found"));
+  let party;
+  if (invoiceType === "purchase") {
+    party = await Party.findOne({ partyName, partyType: "dealer" });
+  } else if (invoiceType === "sale") {
+    party = await Party.findOne({ partyName, partyType: "buyer" });
+  } else {
+    return res.status(400).json(new ApiError(400, "Invalid invoice type"));
+  }
+  console.log("Party", party);
+  if (!party) {
+    return res
+      .status(404)
+      .json(
+        new ApiError(
+          404,
+          `Party ${partyName} not found. Please add party first`
+        )
+      );
   }
 
   let totalPrice = 0;
@@ -49,25 +60,32 @@ const newInvoice = asyncHandler(async (req, res) => {
     products: productDetails,
     total: finalPrice,
     discount,
-    buyerName,
-    phoneNumber: buyer.phoneNumber,
-    address: buyer.address,
+    partyName: party.partyName,
+    phoneNumber: party.phoneNumber,
+    address: party.address,
+    invoiceType,
   });
   await invoice.save();
 
   for (const item of productDetails) {
     const product = await Product.findOne({ productName: item.productName });
     if (product) {
-      product.quantity -= item.quantity;
-      if (product.quantity < 0) {
-        return res.status(400).json(new ApiError(400, "Product out of stock"));
+      if (invoiceType === "purchase") {
+        product.quantity += item.quantity;
+      } else if (invoiceType === "sale") {
+        product.quantity -= item.quantity;
+        if (product.quantity < 0) {
+          return res
+            .status(400)
+            .json(new ApiError(400, "Product quantity not available"));
+        }
       }
       await product.save();
     }
   }
 
-  buyer.totalPurchase = (buyer.totalPurchase || 0) + finalPrice;
-  await buyer.save();
+  party.totalInvoiceAmount = (party.totalInvoiceAmount || 0) + finalPrice;
+  await party.save();
 
   console.log("Invoice", invoice);
   return res

@@ -2,6 +2,17 @@ import mongoose, { Schema } from "mongoose";
 
 const invoiceSchema = new mongoose.Schema(
   {
+    invoiceType: {
+      type: String,
+      required: true,
+      enum: [
+        "purchase",
+        "sale",
+        "paymentGiven",
+        "paymentRecieved",
+        "saleReturn",
+      ],
+    },
     products: {
       type: [],
       required: true,
@@ -13,7 +24,7 @@ const invoiceSchema = new mongoose.Schema(
     total: {
       type: Number,
     },
-    buyerName: {
+    partyName: {
       type: String,
       required: true,
     },
