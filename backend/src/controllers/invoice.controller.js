@@ -36,11 +36,7 @@ const newInvoice = asyncHandler(async (req, res) => {
   const productDetails = [];
 
   // fetch product details and calculate total
-  if (
-    invoiceType === "purchase" ||
-    invoiceType === "sale" ||
-    invoiceType === "saleReturn"
-  ) {
+  if (["purchase", "sale", "saleReturn"].includes(invoiceType)) {
     for (const item of products) {
       const product = await Product.findOne({ productName: item.productName });
 
@@ -49,18 +45,32 @@ const newInvoice = asyncHandler(async (req, res) => {
           .status(404)
           .json(new ApiError(404, `Product ${item.productName} not found`));
       }
-      const productTotalPrice = product.productPrice * item.quantity;
-      totalPrice += productTotalPrice;
-      productDetails.push({
-        productName: item.productName,
-        price: product.productPrice,
-        quantity: item.quantity,
-        total: productTotalPrice,
-      });
+      if (invoiceType === "saleReturn") {
+        const returnAmount = product.productPrice * item.quantity;
+        totalPrice += returnAmount;
+        productDetails.push({
+          productName: item.productName,
+          price: product.productPrice,
+          quantity: item.quantity,
+          total: returnAmount,
+        });
+      } else {
+        const productTotalPrice = product.productPrice * item.quantity;
+        totalPrice += productTotalPrice;
+        productDetails.push({
+          productName: item.productName,
+          price: product.productPrice,
+          quantity: item.quantity,
+          total: productTotalPrice,
+        });
+      }
     }
 
     // Discount
-    const finalPrice = totalPrice - totalPrice * (discount / 100);
+    const finalPrice =
+      invoiceType === "saleReturn"
+        ? totalPrice
+        : totalPrice - totalPrice * (discount / 100);
 
     // create invoice
 
@@ -111,6 +121,7 @@ const newInvoice = asyncHandler(async (req, res) => {
   ) {
     const paymentAmount = req.body.paymentAmount;
     party.totalInvoiceAmount = (party.totalInvoiceAmount || 0) - paymentAmount;
+    party.totalPaidAmount = (party.totalPaidAmount || 0) + paymentAmount;
     await party.save();
     var invoice = new Invoice({
       total: paymentAmount,

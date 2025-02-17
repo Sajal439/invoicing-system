@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const invoiceSchema = new mongoose.Schema(
   {
@@ -33,6 +33,24 @@ const invoiceSchema = new mongoose.Schema(
     },
     address: {
       type: String,
+    },
+    paidAmout: {
+      type: Number,
+      default: 0,
+    },
+    balanceAmout: {
+      type: Number,
+      default: function () {
+        return this.total;
+      },
+    },
+    dueDate: {
+      type: Date,
+      default: function () {
+        const date = new Date();
+        date.setDate(date.getDate() + 30);
+        return date;
+      },
     },
   },
   { timestamps: true }
