@@ -49,8 +49,10 @@ partySchema.pre("save", function (next) {
     this.paymentStatus = "paid";
   } else if (this.totalPaidAmount === 0) {
     this.paymentStatus = "unpaid";
-  } else if (this.totalInvoiceAmount > 0) {
+  } else if (this.totalPaidAmount < this.totalAmount) {
     this.paymentStatus = "partially_paid";
+  } else if (this.totalPaidAmount >= this.totalAmount) {
+    this.paymentStatus = "paid";
   }
   next();
 });

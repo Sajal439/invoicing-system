@@ -60,6 +60,7 @@ const getPartyInvoiceSummary = asyncHandler(async (req, res) => {
   };
 
   // get invoice types based on party type
+
   validInvoiceType.forEach((type) => {
     summary.invoiceByType[type] = invoices.filter(
       (inv) => inv.invoiceType === type
@@ -68,46 +69,45 @@ const getPartyInvoiceSummary = asyncHandler(async (req, res) => {
 
   // generate pdf
 
-//   const doc = new PDFDocument();
+  const doc = new PDFDocument();
 
-//   res.setHeader("Content-Type", "application/pdf");
-//   res.setHeader(
-//     "Content-Disposition",
-//     `attachment; filename=invoice_summary_${partyName}_${partyType}.pdf`
-//   );
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=invoice_summary_${partyName}_${partyType}.pdf`
+  );
 
-//   doc.pipe(res);
+  doc.pipe(res);
 
-//   // add content to pdf
+  // add content to pdf
 
-//   doc.fontSize(20).text("Invoice Summary Report", { align: "center" });
-//   doc.moveDown();
+  doc.fontSize(20).text("Invoice Summary Report", { align: "center" });
+  doc.moveDown();
 
-//   // party details
+  // party details
 
-//   doc.fontSize(16).text("Party Details:");
-//   doc
-//     .fontSize(12)
-//     .text(`Name: ${summary.partyDetails.partyName}`)
-//     .text(`Type: ${summary.partyDetails.partyType}`)
-//     .text(`Phone: ${summary.partyDetails.phoneNumber}`)
-//     .text(`Address: ${summary.partyDetails.address}`);
+  doc.fontSize(16).text("Party Details:");
+  doc
+    .fontSize(12)
+    .text(`Name: ${summary.partyDetails.partyName}`)
+    .text(`Type: ${summary.partyDetails.partyType}`)
+    .text(`Phone: ${summary.partyDetails.phoneNumber}`)
+    .text(`Address: ${summary.partyDetails.address}`);
 
-//   doc.moveDown();
+  doc.moveDown();
 
-//   // invoice types
+  // invoice types
 
-//   doc.fontSize(16).text("Invoice Breakdown:");
-//   Object.entries(summary.invoicesByType).forEach(([type, invoices]) => {
-//     const typeTotal = invoices.reduce((sum, inv) => sum + inv.total, 0);
-//     doc.fontSize(12).text(`${type.charAt(0).toUpperCase() + type.slice(1)}:`);
-//     doc.text(`  Count: ${invoices.length}`);
-//     doc.text(`  Total Amount: ₹${typeTotal.toFixed(2)}`);
-//   });
-//   doc.moveDown();
+  doc.fontSize(16).text("Invoice Breakdown:");
+  Object.entries(summary.invoiceByType).forEach(([type, invoices]) => {
+    const typeTotal = invoices.reduce((sum, inv) => sum + inv.total, 0);
+    doc.fontSize(12).text(`${type.charAt(0).toUpperCase() + type.slice(1)}:`);
+    doc.text(`  Count: ${invoices.length}`);
+    doc.text(`  Total Amount: ₹${typeTotal.toFixed(2)}`);
+  });
+  doc.moveDown();
 
-//   doc.end();
-
+  doc.end();
 });
 
 export { getPartyInvoiceSummary };

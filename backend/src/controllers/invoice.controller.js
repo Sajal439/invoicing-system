@@ -106,11 +106,23 @@ const newInvoice = asyncHandler(async (req, res) => {
 
     if (invoiceType === "purchase" || invoiceType === "sale") {
       party.totalInvoiceAmount = (party.totalInvoiceAmount || 0) + finalPrice;
+      party.totalAmount = (party.totalAmount || 0) + finalPrice;
     } else if (invoiceType === "saleReturn") {
       party.totalInvoiceAmount = (party.totalInvoiceAmount || 0) - finalPrice;
+      party.totalAmount = (party.totalAmount || 0) - finalPrice;
     }
     await party.save();
     console.log("Invoice", invoice);
+
+    if (party.totalInvoiceAmount <= 0) {
+      party.paymentStatus = "paid";
+    } else if (party.totalPaidAmount === 0) {
+      party.paymentStatus = "unpaid";
+    } else if (party.totalPaidAmount < party.totalAmount) {
+      party.paymentStatus = "partially_paid";
+    } else if (party.totalPaidAmount >= party.totalAmount) {
+      party.paymentStatus = "paid";
+    }
 
     return res
       .status(201)
