@@ -1,5 +1,6 @@
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import jwt from "jsonwebtoken";
 
@@ -74,7 +75,7 @@ const login = asyncHandler(async (req, res, next) => {
 
 const logout = asyncHandler(async (req, res) => {
   // Clear the JWT cookie
-  res.cookie("jwt", "loggedout", {
+  res.cookie("jwt", "loggedOut", {
     expires: new Date(Date.now() + 10 * 1000), // Expires in 10 seconds
     httpOnly: true,
   });
@@ -82,4 +83,42 @@ const logout = asyncHandler(async (req, res) => {
   res.status(200).json({ status: "success" });
 });
 
-export { registerUser, login, logout };
+const assignRole = asyncHandler(async (req, res, next) => {
+  const { email, role } = req.body;
+
+  if (!email || !role) {
+    return next(new ApiError(400, "Please provide email and role"));
+  }
+
+  //validate role input
+  const valideRoles = ["admin", "user", "manager"];
+  if (!valideRoles.includes(role)) {
+    return next(new ApiError(400, "Invalid role"));
+  }
+
+  const user = User.findOne({ email });
+
+  if (!user) {
+    return next(new ApiError(404, "User not found"));
+  }
+
+  //update user role
+
+  user.role = role;
+  await user.save();
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { user: { email: user.email, role: user.role } },
+        "Role assigned successfully"
+      )
+    );
+});
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  res.status(200).json(new ApiResponse(200, { user: req.user }, "Success"));
+});
+
+export { registerUser, login, logout, assignRole, getCurrentUser };

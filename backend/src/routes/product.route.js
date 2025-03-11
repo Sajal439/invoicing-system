@@ -9,6 +9,7 @@ import {
 
 const productRouter = Router();
 
+// Write operations - only shopkeeper can access
 productRouter.route("/add-product").post(addProduct);
 productRouter.route("/update-product/add-quantity").put(addProductQuantity);
 productRouter
@@ -16,5 +17,6 @@ productRouter
   .put(deleteProductQuantity);
 
 productRouter.route("/update-price").put(updatePrice);
-productRouter.route("/product-cost", updateCost);
+productRouter.route("/product-cost").put(updateCost);
+
 export { productRouter };
