@@ -3,8 +3,9 @@
     "",
     "\\backend",
     "\\backend\\src",
-    "\\backend\\src\\controllers"
+    "\\backend\\src\\controllers",
+    "\\backend\\src\\routes"
   ],
-  "SelectedNode": "\\backend\\src\\controllers\\party.controller.js",
+  "SelectedNode": "\\backend\\src\\routes\\product.route.js",
   "PreviewInSolutionExplorer": false
 }

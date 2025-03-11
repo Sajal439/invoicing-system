@@ -83,10 +83,34 @@ const updateCost = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, product, "Product Cost updated successfully"));
 });
 
+const getProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, products, "Products fetched successfully"));
+});
+
+const getProductByName = asyncHandler(async (req, res) => {
+  const { productName } = req.params;
+
+  const product = await Product.findOne({ productName });
+
+  if (!product) {
+    return res.status(404).json(new ApiError(404, "product not found"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, product, "Product fetched successfully"));
+});
+
 export {
   addProduct,
   addProductQuantity,
   deleteProductQuantity,
   updatePrice,
   updateCost,
+  getProducts,
+  getProductByName,
 };

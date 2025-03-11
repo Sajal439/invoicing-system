@@ -52,7 +52,7 @@ export const authenticate = asyncHandler(async (req, res, next) => {
 });
 
 //middleware to restrict access to certain roles
-export const restrctTo = (...roles) => {
+export const restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(

@@ -3,6 +3,18 @@
   "WorkspaceRootPath": "C:\\Users\\sajal\\Desktop\\goel traders\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sajal\\Desktop\\goel traders\\backend\\.env||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:backend\\.env||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sajal\\Desktop\\goel traders\\backend\\src\\models\\user.model.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:backend\\src\\models\\user.model.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sajal\\Desktop\\goel traders\\backend\\src\\controllers\\party.controller.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:backend\\src\\controllers\\party.controller.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sajal\\Desktop\\goel traders\\backend\\src\\controllers\\product.controller.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:backend\\src\\controllers\\product.controller.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
@@ -27,6 +39,43 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": ".env",
+              "DocumentMoniker": "C:\\Users\\sajal\\Desktop\\goel traders\\backend\\.env",
+              "RelativeDocumentMoniker": "backend\\.env",
+              "ToolTip": "C:\\Users\\sajal\\Desktop\\goel traders\\backend\\.env",
+              "RelativeToolTip": "backend\\.env",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-03-11T17:51:47.872Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "user.model.js",
+              "DocumentMoniker": "C:\\Users\\sajal\\Desktop\\goel traders\\backend\\src\\models\\user.model.js",
+              "RelativeDocumentMoniker": "backend\\src\\models\\user.model.js",
+              "ToolTip": "C:\\Users\\sajal\\Desktop\\goel traders\\backend\\src\\models\\user.model.js",
+              "RelativeToolTip": "backend\\src\\models\\user.model.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-03-11T17:51:07.763Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "party.controller.js",
+              "DocumentMoniker": "C:\\Users\\sajal\\Desktop\\goel traders\\backend\\src\\controllers\\party.controller.js",
+              "RelativeDocumentMoniker": "backend\\src\\controllers\\party.controller.js",
+              "ToolTip": "C:\\Users\\sajal\\Desktop\\goel traders\\backend\\src\\controllers\\party.controller.js",
+              "RelativeToolTip": "backend\\src\\controllers\\party.controller.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-03-08T17:14:48.907Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "product.controller.js",
               "DocumentMoniker": "C:\\Users\\sajal\\Desktop\\goel traders\\backend\\src\\controllers\\product.controller.js",
               "RelativeDocumentMoniker": "backend\\src\\controllers\\product.controller.js",
@@ -34,12 +83,11 @@
               "RelativeToolTip": "backend\\src\\controllers\\product.controller.js",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2025-03-08T17:14:29.215Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-08T17:14:29.215Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "auth.controller.js",
               "DocumentMoniker": "C:\\Users\\sajal\\Desktop\\goel traders\\backend\\src\\controllers\\auth.controller.js",
               "RelativeDocumentMoniker": "backend\\src\\controllers\\auth.controller.js",
@@ -47,12 +95,11 @@
               "RelativeToolTip": "backend\\src\\controllers\\auth.controller.js",
               "ViewState": "AgIAAB4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2025-03-08T17:13:48.218Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-08T17:13:48.218Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "server.js",
               "DocumentMoniker": "C:\\Users\\sajal\\Desktop\\goel traders\\backend\\server.js",
               "RelativeDocumentMoniker": "backend\\server.js",
@@ -60,8 +107,7 @@
               "RelativeToolTip": "backend\\server.js",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2025-03-08T17:12:41.535Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-08T17:12:41.535Z"
             }
           ]
         }
