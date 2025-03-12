@@ -1,9 +1,10 @@
 import "./App.css";
+import AuthPage from "./pages/AuthPage";
 
 function App() {
   return (
     <div>
-      <h1>Goel Traders</h1>
+      <AuthPage />
     </div>
   );
 }

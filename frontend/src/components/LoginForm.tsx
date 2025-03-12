@@ -9,11 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
-export function RegisterForm() {
+export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
     password: "",
   });
@@ -31,10 +30,10 @@ export function RegisterForm() {
     try {
       // Here you would integrate with your authentication backend
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Registration submitted:", formData);
+      console.log("Login submitted:", formData);
       // Redirect or show success message
     } catch (error) {
-      console.error("Registration failed:", error);
+      console.error("Login failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -45,21 +44,9 @@ export function RegisterForm() {
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4 p-0">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
-              id="name"
-              name="name"
-              placeholder="John Doe"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              autoComplete="name"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="register-email">Email</Label>
-            <Input
-              id="register-email"
+              id="email"
               name="email"
               type="email"
               placeholder="name@example.com"
@@ -70,17 +57,26 @@ export function RegisterForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="register-password">Password</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <button
+                type="button"
+                className="text-xs text-muted-foreground hover:text-primary"
+                onClick={() => {}}
+              >
+                Forgot password?
+              </button>
+            </div>
             <div className="relative">
               <Input
-                id="register-password"
+                id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
                 required
-                autoComplete="new-password"
+                autoComplete="current-password"
               />
               <button
                 type="button"
@@ -94,9 +90,6 @@ export function RegisterForm() {
                 )}
               </button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Password must be at least 8 characters long
-            </p>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4 p-0 pt-4">
@@ -104,28 +97,12 @@ export function RegisterForm() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating account...
+                Signing in...
               </>
             ) : (
-              "Create account"
+              "Sign in"
             )}
           </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            By creating an account, you agree to our{" "}
-            <a
-              href="#"
-              className="underline underline-offset-2 hover:text-primary"
-            >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="#"
-              className="underline underline-offset-2 hover:text-primary"
-            >
-              Privacy Policy
-            </a>
-          </p>
         </CardFooter>
       </form>
     </Card>
