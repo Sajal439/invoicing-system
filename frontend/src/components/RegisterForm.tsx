@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-
+import axios from "axios";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,9 +13,10 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     email: "",
     password: "",
+    passwordConfirm: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,16 +26,50 @@ export function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.password !== formData.passwordConfirm) {
+      alert("Passwords do not match");
+      return;
+    }
+    if (formData.password.length < 8) {
+      alert("Password must be at least 8 characters long");
+      return;
+    }
     setIsLoading(true);
 
-    // Simulate API call
     try {
-      // Here you would integrate with your authentication backend
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Registration submitted:", formData);
-      // Redirect or show success message
+      const response = await axios.post(
+        "http://localhost:8000/api/users/register",
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Register submitted:", response.data);
+      alert("Register submitted:");
+      setFormData({
+        fullName: "",
+        email: "",
+        password: "",
+        passwordConfirm: "",
+      });
     } catch (error) {
-      console.error("Registration failed:", error);
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Registration Failed:",
+          error.response?.data?.message || error.message
+        );
+        alert(
+          "Registration failed: " +
+            (error.response?.data?.message || "Unknown error")
+        );
+      } else {
+        console.error("Registration Failed:", error);
+        alert("Registration failed: Unknown error");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -48,9 +83,9 @@ export function RegisterForm() {
             <Label htmlFor="name">Full Name</Label>
             <Input
               id="name"
-              name="name"
-              placeholder="John Doe"
-              value={formData.name}
+              name="fullName"
+              placeholder="Enter your full name"
+              value={formData.fullName}
               onChange={handleChange}
               required
               autoComplete="name"
@@ -76,7 +111,7 @@ export function RegisterForm() {
                 id="register-password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Create a password"
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -93,6 +128,23 @@ export function RegisterForm() {
                   <Eye className="h-4 w-4" />
                 )}
               </button>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="register-confirm-password">
+                Confirm Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="register-confirm-password"
+                  name="passwordConfirm"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Confirm Your Password"
+                  value={formData.passwordConfirm}
+                  onChange={handleChange}
+                  required
+                  autoComplete="new-password"
+                />
+              </div>
             </div>
             <p className="text-xs text-muted-foreground">
               Password must be at least 8 characters long

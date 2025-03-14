@@ -3,7 +3,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import jwt from "jsonwebtoken";
-
+import nodemailer from "nodemailer";
+import crypto from "crypto";
 // Helper function to sign JWT token
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -96,7 +97,7 @@ const assignRole = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "Invalid role"));
   }
 
-  const user = User.findOne({ email });
+  const user = await User.findOne({ email });
 
   if (!user) {
     return next(new ApiError(404, "User not found"));
@@ -121,4 +122,103 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { user: req.user }, "Success"));
 });
 
-export { registerUser, login, logout, assignRole, getCurrentUser };
+const forgotPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) {
+    return next(new ApiError(400, "Please provide email"));
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new ApiError(404, "User not found"));
+  }
+
+  // Generate random reset token
+
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  try {
+    const resetURL = `${req.protocol}://${req.get(
+      "host"
+    )}/api/users/reset-password/${resetToken}`;
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+    const mailOptions = {
+      from: "Goel Traders <noreply@goeltraders.com>",
+      to: user.email,
+      subject: "Your password reset token (valid for 10 min)",
+      text: `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`,
+      html: ` <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2>Reset Your Password</h2>
+          <p>Hello ${user.fullName},</p>
+          <p>You requested a password reset. Please click the button below to reset your password:</p>
+          <a href="${resetURL.replace(
+            "/api/users/reset-password/",
+            "/reset-password/"
+          )}" 
+             style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; 
+                    text-decoration: none; border-radius: 4px; margin: 20px 0;">
+            Reset Password
+          </a>
+          <p>If you didn't request this, please ignore this email.</p>
+          <p>This password reset link is valid for 10 minutes.</p>
+          <p>Best regards,<br>Goel Traders Team</p>
+        </div>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Password rest link sent to email"));
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ApiError(500, "Error sending email"));
+  }
+});
+
+const resetPassword = asyncHandler(async (req, res, next) => {
+  const { token } = req.params;
+  const { password, passwordConfirm } = req.body;
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ApiError(400, "Token is invalid or has expired"));
+  }
+
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  createSendToken(user, 200, res);
+});
+
+export {
+  registerUser,
+  login,
+  logout,
+  assignRole,
+  getCurrentUser,
+  forgotPassword,
+  resetPassword,
+};

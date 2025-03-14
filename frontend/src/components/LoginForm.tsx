@@ -1,39 +1,70 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import axios from "axios";
+import { toast } from "sonner";
 
 export function LoginForm() {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (error) setError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // Simulate API call
     try {
-      // Here you would integrate with your authentication backend
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Login submitted:", formData);
-      // Redirect or show success message
+      const response = await axios.post(
+        "http://localhost:8000/api/users/login",
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Login submitted:", response.data);
+
+      if (response.data.data?.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+      }
+
+      toast.success("Login successful", {
+        description: "You have successfully logged in",
+      });
+      navigate("/all");
     } catch (error) {
-      console.error("Login failed:", error);
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || "Login Failed";
+        setError(errorMessage);
+        toast.error("login Failed", { description: errorMessage });
+      } else {
+        setError("An Unexpected error occured");
+        toast.error("login Failed", {
+          description: "An Unexpected error occured",
+        });
+      }
+      console.error("Login Failed", error);
     } finally {
       setIsLoading(false);
     }
@@ -59,10 +90,10 @@ export function LoginForm() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <button
+              <button 
                 type="button"
                 className="text-xs text-muted-foreground hover:text-primary"
-                onClick={() => {}}
+                onClick={() => navigate("/forgot-password")}
               >
                 Forgot password?
               </button>
