@@ -8,8 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { Link, useNavigate } from "react-router-dom";
 
 export function RegisterForm() {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,7 +21,11 @@ export function RegisterForm() {
     password: "",
     passwordConfirm: "",
   });
-
+  const [error, setError] = useState("");
+  const navigateToLogin = () => {
+    console.log("Navigating to login");
+    navigate("/login");
+  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -37,38 +44,48 @@ export function RegisterForm() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/users/register",
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      console.log("Register submitted:", response.data);
-      alert("Register submitted:");
-      setFormData({
-        fullName: "",
-        email: "",
-        password: "",
-        passwordConfirm: "",
+      await axios.post("http://localhost:8000/api/users/register", formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+
+      toast.success("registration SUccessful", {
+        description: "You have successfully registered",
+        onDismiss: navigateToLogin,
+      });
+      setTimeout(() => {
+        navigateToLogin();
+      }, 1000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error(
-          "Registration Failed:",
-          error.response?.data?.message || error.message
-        );
-        alert(
-          "Registration failed: " +
-            (error.response?.data?.message || "Unknown error")
-        );
+        const errorMessage =
+          error.response?.data?.message || "Registration Failed";
+        if (
+          errorMessage
+            .toLowerCase()
+            .includes("User already exists with this email") ||
+          errorMessage.toLowerCase().includes("User already exists")
+        ) {
+          toast.error("Account Exists", {
+            description: "Would you like to login instead?",
+            action: {
+              label: "login",
+              onClick: navigateToLogin,
+            },
+          });
+        } else {
+          setError(errorMessage);
+          toast.error("registration failed", {
+            description: errorMessage,
+          });
+        }
       } else {
-        console.error("Registration Failed:", error);
-        alert("Registration failed: Unknown error");
+        setError("An unexpected error occurred");
+        toast.error("Registration failed", {
+          description: "errro",
+        });
       }
     } finally {
       setIsLoading(false);
@@ -79,6 +96,11 @@ export function RegisterForm() {
     <Card className="border-none shadow-none">
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4 p-0">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-md mb-4">
+              {error}
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
             <Input
@@ -162,6 +184,15 @@ export function RegisterForm() {
               "Create account"
             )}
           </Button>
+          <p className="text-center text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link
+              className="text-primary hover:underline font-medium"
+              to="/login"
+            >
+              Sign In
+            </Link>
+          </p>
           <p className="text-center text-xs text-muted-foreground">
             By creating an account, you agree to our{" "}
             <a

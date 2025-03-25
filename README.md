@@ -81,8 +81,8 @@ goel-traders/
 
 1. Clone the repository
    ```
-   git clone https://github.com/yourusername/goel-traders.git
-   cd goel-traders
+   git clone https://github.com/Sajal439/invoicing-system.git
+   cd invoicing-system
    ```
 
 2. Install backend dependencies
@@ -93,7 +93,6 @@ goel-traders/
 
 3. Set up environment variables
    Create a `.env` file in the backend directory with the following variables:
-   ```
    PORT=5000
    MONGODB_URI=your_mongodb_connection_string
    JWT_SECRET=your_jwt_secret

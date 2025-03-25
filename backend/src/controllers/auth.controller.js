@@ -66,8 +66,11 @@ const login = asyncHandler(async (req, res, next) => {
 
   // 2) Check if user exists && password is correct
   const user = await User.findOne({ email }).select("+password");
-  if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new ApiError(401, "Incorrect email or password"));
+  if (!user) {
+    return next(new ApiError(401, "Email does not exist.please regiser"));
+  }
+  if (!(await user.correctPassword(password, user.password))) {
+    return next(new ApiError(401, "Incorrect password"));
   }
 
   // 3) Send token to client
@@ -163,7 +166,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
           <p>You requested a password reset. Please click the button below to reset your password:</p>
           <a href="${resetURL.replace(
             "/api/users/reset-password/",
-            "/reset-password/"
+            `/reset-password/${resetToken}`
           )}" 
              style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; 
                     text-decoration: none; border-radius: 4px; margin: 20px 0;">
@@ -213,6 +216,27 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+const verifyResetToken = asyncHandler(async (req, res, next) => {
+  const { token } = req.query;
+
+  if (!token) {
+    return next(new ApiError(400, "Token is required"));
+  }
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ApiError(404, "Token is invalid or has expired"));
+  }
+
+  res.status(200).json(new ApiResponse(200, {}, "Token is valid"));
+});
+
 export {
   registerUser,
   login,
@@ -221,4 +245,5 @@ export {
   getCurrentUser,
   forgotPassword,
   resetPassword,
+  verifyResetToken,
 };

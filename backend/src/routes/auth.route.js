@@ -7,6 +7,7 @@ import {
   logout,
   registerUser,
   resetPassword,
+  verifyResetToken,
 } from "../controllers/auth.controller.js";
 import { addParty } from "../controllers/party.controller.js";
 import { authenticate, restrictTo } from "../middlewares/auth.middleware.js";
@@ -18,6 +19,7 @@ userRouter.route("/login").post(login);
 userRouter.route("/logout").get(logout);
 userRouter.route("/forgot-password").post(forgotPassword);
 userRouter.route("/reset-password/:token").patch(resetPassword);
+userRouter.route("/verify-reset-token").get(verifyResetToken);
 
 userRouter.use(authenticate);
 userRouter.route("/me").get(getCurrentUser);
