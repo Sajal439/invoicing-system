@@ -143,9 +143,8 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   try {
-    const resetURL = `${req.protocol}://${req.get(
-      "host"
-    )}/api/users/reset-password/${resetToken}`;
+    const frontendURL = process.env.FRONTEND_URL || "http://localhost:3000";
+    const resetURL = `${frontendURL}/reset-password/${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -164,10 +163,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
           <h2>Reset Your Password</h2>
           <p>Hello ${user.fullName},</p>
           <p>You requested a password reset. Please click the button below to reset your password:</p>
-          <a href="${resetURL.replace(
-            "/api/users/reset-password/",
-            `/reset-password/${resetToken}`
-          )}" 
+          <a href="${resetURL}" 
              style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; 
                     text-decoration: none; border-radius: 4px; margin: 20px 0;">
             Reset Password

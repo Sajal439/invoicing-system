@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
   Card,
@@ -15,11 +15,13 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
+interface ResetPasswordFormProps {
+  token: string;
+}
 
-export function ResetPasswordForm() {
+export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
+
   const [formData, setFormData] = useState({
     password: "",
     passwordConfirm: "",
@@ -111,7 +113,7 @@ export function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      await axios.post(
+      await axios.patch(
         `http://localhost:8000/api/users/reset-password/${token}`,
         {
           password: formData.password,
@@ -125,7 +127,12 @@ export function ResetPasswordForm() {
       );
 
       setIsSubmitted(true);
-      toast.success("Password has been reset successfully");
+      toast.success("Password has been reset successfully", {
+        description: "You can now log in with your new password",
+      });
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (error) {
       console.error("There was an error resetting password", error);
       if (axios.isAxiosError(error)) {

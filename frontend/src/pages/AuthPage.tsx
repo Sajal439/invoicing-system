@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { LoginForm } from "@/components/LoginForm";
 import { RegisterForm } from "@/components/RegisterForm";
 import { AnimatePresence, motion } from "framer-motion";
@@ -11,17 +11,25 @@ interface AuthPageProps {
 }
 
 export default function AuthPage({ defaultMode = "login" }: AuthPageProps) {
-  const [isLogin, setIsLogin] = useState(defaultMode === "login");
   const navigate = useNavigate();
   const location = useLocation();
+  const isLogin = location.pathname === "/login";
+
+  const handleModeSwitch = (mode: "login" | "register") => {
+    navigate(`/${mode}`);
+  };
 
   useEffect(() => {
-    const path = isLogin ? "/login" : "/register";
-
-    if (location.pathname !== path) {
-      navigate(path, { replace: true });
+    // Ensure we're on the correct path based on defaultMode when component mounts
+    if (defaultMode === "login" && location.pathname !== "/login") {
+      navigate("/login", { replace: true });
+    } else if (
+      defaultMode === "register" &&
+      location.pathname !== "/register"
+    ) {
+      navigate("/register", { replace: true });
     }
-  }, [isLogin, navigate, location.pathname]);
+  }, [defaultMode, navigate, location.pathname]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
@@ -35,7 +43,7 @@ export default function AuthPage({ defaultMode = "login" }: AuthPageProps) {
 
         <div className="flex justify-center space-x-2 mb-8">
           <button
-            onClick={() => setIsLogin(true)}
+            onClick={() => handleModeSwitch("login")}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
               isLogin
                 ? "bg-primary text-primary-foreground"
@@ -45,7 +53,7 @@ export default function AuthPage({ defaultMode = "login" }: AuthPageProps) {
             Login
           </button>
           <button
-            onClick={() => setIsLogin(false)}
+            onClick={() => handleModeSwitch("register")}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
               !isLogin
                 ? "bg-primary text-primary-foreground"

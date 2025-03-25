@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export function RegisterForm() {
   const navigate = useNavigate();
@@ -22,24 +22,54 @@ export function RegisterForm() {
     passwordConfirm: "",
   });
   const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState({
+    password: "",
+    confirmPassword: "",
+  });
   const navigateToLogin = () => {
     console.log("Navigating to login");
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (error) setError("");
+
+    if (name === "password" || name === "confirmPassword") {
+      setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+
+      if (name === "confirmPassword" && value !== formData.password) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          confirmPassword: "Passwords do not match",
+        }));
+      }
+
+      if (name === "password" && value.length > 0 && value.length < 8) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          password: "password must be atleast 8 characters long",
+        }));
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationErrors({ password: "", confirmPassword: "" });
     if (formData.password !== formData.passwordConfirm) {
-      alert("Passwords do not match");
+      setValidationErrors((prev) => ({
+        ...prev,
+        confirmPassword: "Passwords do not match",
+      }));
       return;
     }
     if (formData.password.length < 8) {
-      alert("Password must be at least 8 characters long");
-      return;
+      setValidationErrors((prev) => ({
+        ...prev,
+        password: "Password must be atleast 8 characters long",
+      }));
     }
     setIsLoading(true);
 
@@ -97,8 +127,20 @@ export function RegisterForm() {
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4 p-0">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-md mb-4">
-              {error}
+            <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-md mb-4 flex flex-col">
+              <div className="flex items-start">
+                <p className="font-medium">{error} </p>
+              </div>
+              {error.toLowerCase().includes("already exists") && (
+                <Button
+                  className="p-0 h-auto text-sm text-red-600 underline hover:text-red-800 mt-2"
+                  variant="link"
+                  type="button"
+                  onClick={navigateToLogin}
+                >
+                  Login Instead
+                </Button>
+              )}
             </div>
           )}
           <div className="space-y-2">
@@ -138,6 +180,7 @@ export function RegisterForm() {
                 onChange={handleChange}
                 required
                 autoComplete="new-password"
+                className={validationErrors.password ? "border-red-500" : ""}
               />
               <button
                 type="button"
@@ -151,6 +194,11 @@ export function RegisterForm() {
                 )}
               </button>
             </div>
+            {validationErrors.password && (
+              <p className="text-sm text-red-500 mt-1">
+                {validationErrors.password}
+              </p>
+            )}
             <div className="space-y-2">
               <Label htmlFor="register-confirm-password">
                 Confirm Password
@@ -165,8 +213,16 @@ export function RegisterForm() {
                   onChange={handleChange}
                   required
                   autoComplete="new-password"
+                  className={
+                    validationErrors.confirmPassword ? "border-red-500" : ""
+                  }
                 />
               </div>
+              {validationErrors.confirmPassword && (
+                <p className="text-sm text-red-500 mt-1">
+                  {validationErrors.confirmPassword}
+                </p>
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
               Password must be at least 8 characters long
@@ -184,14 +240,17 @@ export function RegisterForm() {
               "Create account"
             )}
           </Button>
+
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link
-              className="text-primary hover:underline font-medium"
-              to="/login"
+            <Button
+              type="button"
+              variant="link"
+              className="p-0 h-auto font-medium"
+              onClick={navigateToLogin}
             >
               Sign In
-            </Link>
+            </Button>
           </p>
           <p className="text-center text-xs text-muted-foreground">
             By creating an account, you agree to our{" "}

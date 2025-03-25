@@ -3,8 +3,22 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 
+const PUBLIC_PATHS = [
+  "/api/users/login",
+  "/api/users/register",
+  "/api/users/forgot-password",
+  "/api/users/reset-password",
+  "/api/users/verify-reset-token",
+];
 // Middleware to verify JWT token
 export const authenticate = asyncHandler(async (req, res, next) => {
+  const isPublicPath = PUBLIC_PATHS.some(
+    (path) => req.path.startsWith(path) || req.path.includes("reset-password")
+  );
+
+  if (isPublicPath) {
+    return next();
+  }
   let token;
   // Get token from header or cookie
   if (

@@ -15,7 +15,6 @@ function App() {
 
       {/* password recovery routes */}
       <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
     </Routes>
   );

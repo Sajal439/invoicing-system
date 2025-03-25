@@ -16,13 +16,13 @@ const userRouter = Router();
 
 userRouter.route("/register").post(registerUser);
 userRouter.route("/login").post(login);
-userRouter.route("/logout").get(logout);
 userRouter.route("/forgot-password").post(forgotPassword);
 userRouter.route("/reset-password/:token").patch(resetPassword);
 userRouter.route("/verify-reset-token").get(verifyResetToken);
 
 userRouter.use(authenticate);
 userRouter.route("/me").get(getCurrentUser);
+userRouter.route("/logout").get(logout);
 userRouter.route("/assign-role").post(restrictTo("admin"), assignRole);
 userRouter.route("/add-party").post(restrictTo("admin"), addParty);
 

@@ -20,6 +20,10 @@ export function LoginForm() {
     password: "",
   });
 
+  const navigateToRegister = () => {
+    console.log("Navigating to register");
+    navigate("/register", { replace: true });
+  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -113,7 +117,7 @@ export function LoginForm() {
                     variant="link"
                     className="p-0 h-auto text-sm text-red-600 underline hover:text-red-800"
                     type="button"
-                    onClick={() => navigate("/register")}
+                    onClick={navigateToRegister}
                   >
                     Create an account instead
                   </Button>
@@ -187,12 +191,13 @@ export function LoginForm() {
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="text-primary hover:underline font-medium"
+            <Button
+              variant="link"
+              className="p-0 h-auto text-primary hover:underline font-medium"
+              onClick={navigateToRegister}
             >
               Create One
-            </Link>
+            </Button>
           </p>
         </CardFooter>
       </form>
