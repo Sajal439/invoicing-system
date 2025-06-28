@@ -233,6 +233,83 @@ const verifyResetToken = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, {}, "Token is valid"));
 });
 
+const createAdmin = asyncHandler(async (req, res, next) => {
+  const { fullName, email, password, passwordConfirm } = req.body;
+  if (req.user.role !== "admin") {
+    return next(new ApiError(403, "Only admins can create other admins"));
+  }
+  if (!fullName || !email || !password || !passwordConfirm) {
+    return next(new ApiError(400, "Please provide all required fields"));
+  }
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return next(new ApiError(400, "User already exists with this email"));
+  }
+
+  const newAdmin = await User.create({
+    fullName,
+    email,
+    password,
+    passwordConfirm,
+    role: "admin",
+  });
+
+  newAdmin.password = undefined;
+
+  res
+    .status(201)
+    .json(
+      new ApiResponse(201, { user: newAdmin }, "Admin created successfully")
+    );
+});
+
+const createInitialAdmin = asyncHandler(async (req, res, next) => {
+  const existingAdmin = await User.findOne({ role: "admin" });
+  if (existingAdmin) {
+    return next(
+      new ApiError(
+        403,
+        "Initial admin already exists, cannot create another one"
+      )
+    );
+  }
+  const { fullName, email, password, passwordConfirm, setupKey } = req.body;
+  if (!setupKey || setupKey !== process.env.ADMIN_SETUP_KEY) {
+    return next(new ApiError(403, "Invalid setup key"));
+  }
+  if (!fullName || !email || !password || !passwordConfirm) {
+    return next(new ApiError(400, "Please provide all required fields"));
+  }
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return next(new ApiError(400, "User already exists with this email"));
+  }
+
+  const initialAdmin = await User.create({
+    fullName,
+    email,
+    password,
+    passwordConfirm,
+    role: "admin",
+  });
+  createSendToken(initialAdmin, 201, res);
+});
+const getSetupStatus = asyncHandler(async (req, res) => {
+  const adminExists = await User.findOne({ role: "admin" });
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        isSetupComplete: !!adminExists,
+        requiresInitialSetup: !adminExists,
+      },
+      "Setup status retrieved successfully"
+    )
+  );
+});
+
 export {
   registerUser,
   login,
@@ -242,4 +319,7 @@ export {
   forgotPassword,
   resetPassword,
   verifyResetToken,
+  createAdmin,
+  createInitialAdmin,
+  getSetupStatus,
 };

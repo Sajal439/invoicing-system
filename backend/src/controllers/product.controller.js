@@ -6,20 +6,47 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 const addProduct = asyncHandler(async (req, res) => {
   const { productName, productPrice, productCost, quantity, brand } = req.body;
 
-  const product = await Product.create({
-    productName,
-    productPrice,
-    productCost,
-    quantity,
-    brand,
-  });
-  const createdProduct = await Product.findById(product._id);
-  if (!createdProduct) {
-    return res.status(400).json(new ApiError(400, "Product not created"));
+  const numericQuantity = Number(quantity);
+  if (isNaN(numericQuantity)) {
+    return res
+      .status(400)
+      .json(new ApiError(400, "Quantity must be a valid number"));
   }
-  return res
-    .status(201)
-    .json(new ApiResponse(201, product, "Product added successfully"));
+  const existingProduct = await Product.findOne({ productName, brand });
+
+  if (existingProduct) {
+    // Update existing product
+    existingProduct.productPrice = productPrice;
+    existingProduct.productCost = productCost;
+    existingProduct.quantity =
+      Number(existingProduct.quantity) + numericQuantity; // Add to existing quantity
+
+    await existingProduct.save();
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, existingProduct, "Product updated successfully")
+      );
+  } else {
+    // Create new product
+    const newProduct = await Product.create({
+      productName,
+      productPrice,
+      productCost,
+      quantity: numericQuantity,
+      brand,
+    });
+
+    const createdProduct = await Product.findById(newProduct._id);
+    if (!createdProduct) {
+      return res.status(400).json(new ApiError(400, "Product not created"));
+    }
+
+    return res
+      .status(201)
+      .json(new ApiResponse(201, createdProduct, "Product added successfully"));
+  }
 });
 
 const addProductQuantity = asyncHandler(async (req, res) => {

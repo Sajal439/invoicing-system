@@ -6,9 +6,12 @@ import { User } from "../models/user.model.js";
 const PUBLIC_PATHS = [
   "/api/users/login",
   "/api/users/register",
+  "/api/users/logout",
   "/api/users/forgot-password",
   "/api/users/reset-password",
   "/api/users/verify-reset-token",
+  "/api/users/setup-status",
+  "/api/users/initial-setup",
 ];
 // Middleware to verify JWT token
 export const authenticate = asyncHandler(async (req, res, next) => {
