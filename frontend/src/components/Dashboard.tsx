@@ -14,14 +14,15 @@ interface SalesSummary {
   }[];
 }
 
-const DashboardPage = () => {
+const Dashboard = () => {
   const [summary, setSummary] = useState<SalesSummary | null>(null);
 
   useEffect(() => {
     const fetchSummary = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/invoice/summary"
+          "http://localhost:8000/api/invoice/summary",
+          { withCredentials: true }
         );
         setSummary(response.data.data);
         console.log("Summary data:", response.data.data);
@@ -88,4 +89,4 @@ const DashboardPage = () => {
   );
 };
 
-export default DashboardPage;
+export default Dashboard;

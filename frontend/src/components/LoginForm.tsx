@@ -54,7 +54,7 @@ export function LoginForm() {
       toast.success("Login successful", {
         description: "You have successfully logged in",
       });
-      navigate("/all");
+      navigate("/home");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || "Login failed";

@@ -5,7 +5,7 @@ const partySchema = new mongoose.Schema(
   {
     partyName: {
       type: String,
-      required: [true, "Dealer name is required"],
+      required: [true, "Party name is required"],
       trim: true,
     },
     partyType: {
@@ -15,13 +15,13 @@ const partySchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: Number,
-      required: [true, "Phone number of the dealer is required"],
+      required: [true, "Phone number of the party is required"],
       unique: true,
       match: [/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number"],
     },
     address: {
       type: String,
-      required: [true, "Address of the dealer is required"],
+      required: [true, "Address of the party is required"],
     },
     totalInvoiceAmount: {
       type: Number,
@@ -45,8 +45,8 @@ const partySchema = new mongoose.Schema(
 );
 
 partySchema.pre("save", function (next) {
-  if (this.totalInvoiceAmount <= 0) {
-    this.paymentStatus = "paid";
+  if (this.totalAmount === 0) {
+    this.paymentStatus = "unpaid";
   } else if (this.totalPaidAmount === 0) {
     this.paymentStatus = "unpaid";
   } else if (this.totalPaidAmount < this.totalAmount) {

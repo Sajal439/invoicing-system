@@ -132,40 +132,58 @@ const getPartyInvoiceSummary = asyncHandler(async (req, res) => {
 });
 
 const getSalesSummary = asyncHandler(async (req, res) => {
-  const invoices = await Invoice.find().sort({ createdAt: -1 });
+  try {
+    const invoices = await Invoice.find().sort({ createdAt: -1 });
 
-  const summary = {
-    totalSales: 0,
-    totalPurchases: 0,
-    totalPaymentsReceived: 0,
-    totalPaymentsGiven: 0,
-    totalSaleReturns: 0,
-    recentTransactions: invoices.slice(0, 5),
-  };
+    const summary = {
+      totalSales: 0,
+      totalPurchases: 0,
+      totalPaymentsRecieved: 0,
+      totalPaymentsGiven: 0,
+      totalSaleReturns: 0,
+      recentTransactions: [],
+    };
 
-  invoices.forEach((invoice) => {
-    switch (invoice.invoiceType) {
-      case "sale":
-        summary.totalSales += invoice.total;
-        break;
-      case "purchase":
-        summary.totalPurchases += invoice.total;
-        break;
-      case "paymentRecieved":
-        summary.totalPaymentsReceived += invoice.total;
-        break;
-      case "paymentGiven":
-        summary.totalPaymentsGiven += invoice.total;
-        break;
-      case "saleReturn":
-        summary.totalSaleReturns += invoice.total;
-        break;
-    }
-  });
+    invoices.forEach((invoice) => {
+      const total = typeof invoice.total === "number" ? invoice.total : 0;
+      switch (invoice.invoiceType) {
+        case "sale":
+          summary.totalSales += total;
+          break;
+        case "purchase":
+          summary.totalPurchases += total;
+          break;
+        case "paymentRecieved":
+          summary.totalPaymentsRecieved += total;
+          break;
+        case "paymentGiven":
+          summary.totalPaymentsGiven += total;
+          break;
+        case "saleReturn":
+          summary.totalSaleReturns += total;
+          break;
+      }
+    });
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, summary, "Sales summary fetched successfully"));
+    summary.recentTransactions = invoices.slice(0, 10).map((inv) => ({
+      invoiceType: inv.invoiceType,
+      total: typeof inv.total === "number" ? inv.total : 0,
+      createdAt: inv.createdAt,
+    }));
+
+    // Use a plain object instead of ApiResponse
+    return res.status(200).json({
+      status: "success",
+      data: summary,
+      message: "Sales summary fetched successfully",
+    });
+  } catch (err) {
+    console.error("Error in getSalesSummary:", err);
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, summary, "Sales summary fetched successfully")
+      );
+  }
 });
-
 export { getPartyInvoiceSummary, getSalesSummary };

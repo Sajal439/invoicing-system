@@ -34,11 +34,11 @@ const invoiceSchema = new mongoose.Schema(
     address: {
       type: String,
     },
-    paidAmout: {
+    paidAmount: {
       type: Number,
       default: 0,
     },
-    balanceAmout: {
+    balanceAmount: {
       type: Number,
       default: function () {
         return this.total;
